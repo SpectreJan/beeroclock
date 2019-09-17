@@ -145,5 +145,8 @@ if __name__ == "__main__":
         diffsec = (diff_dtime.seconds % 60)
 
         print_time(diff_dtime.days, int(diffhour), int(diffminute), diffsec)
-        time.sleep(0.25 - (dtime.now().timestamp() - now_ts))
+
+        sleep_duration = 0.25 - (dtime.now().timestamp() - now_ts)
+        if sleep_duration > 0:
+            time.sleep(sleep_duration)
 
