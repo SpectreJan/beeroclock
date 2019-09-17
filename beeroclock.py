@@ -1,4 +1,4 @@
-#! /bin/env python3
+#! /usr/bin/env python3
 from datetime import datetime as dtime
 from datetime import timedelta as timed
 import time
