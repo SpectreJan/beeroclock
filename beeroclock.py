@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 from datetime import datetime as dtime
 from datetime import timedelta as timed
+import datetime
 import time
 import signal
 import sys
@@ -45,8 +46,8 @@ beertime_plain = "BEERTIME!"
 ## Other global variables
 show_beertime = True
 cursor_up = "\033[A"
-beerday = 4
-beeroclock = 16
+beerday = 2
+beeroclock = datetime.time(21, 35, 0, 0)
 delta_days = 0
 
 ################################################################################
@@ -88,13 +89,15 @@ def print_time_plain(days, hours, mins, sec):
 def print_beertime_fancy():
 
     global show_beertime
+    print(cursor_up, end="")
+    print(""*99, end="")
     if show_beertime == True:
         print(beertime_fancy)
     else:
         for i in range(9):
             print(" " * 87)
 
-    print(cursor_up * 10)
+    print(cursor_up * 9)
     show_beertime = not show_beertime
 
 ################################################################################
@@ -136,25 +139,28 @@ if __name__ == "__main__":
 
     ## Main Loop
     while True:
+
         now = dtime.now()
         now_ts = now.timestamp()
         current_weekday = now.weekday()
         now_t = now.time()
-        if((beerday == current_weekday) and (now_t.hour >= beeroclock)):
-            if(now_t.hour<(beeroclock+4)):
-                print_beertime()
-                time.sleep(1)
-                continue;
-            else:
-                delta_days = 7
-        else:
-            delta_days = (beerday-current_weekday)%7
+
+        delta_days = (beerday-current_weekday)%7
 
         beerdate = now.date() + timed(days=delta_days)
-        beerdatetime = dtime(beerdate.year, beerdate.month, beerdate.day,
-                beeroclock, 0,0,0)
-        diff_dtime = beerdatetime - now
+        beerdatetime = dtime.combine(beerdate,
+                beeroclock)
 
+        if now < beerdatetime:
+            pass
+        elif now <= beerdatetime + timed(hours=4):
+            print_beertime()
+            time.sleep(1)
+            continue
+        else:
+            beerdatetime = beerdatetime + timed(days=7)
+
+        diff_dtime = beerdatetime - now
         diffhour = diff_dtime.seconds/3600
         diffminute = (diff_dtime.seconds % 3600)/60
         diffsec = (diff_dtime.seconds % 60)
