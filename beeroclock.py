@@ -43,6 +43,16 @@ beertime_fancy = """
 8888888P\"  8888888888 8888888888 888   T88b    888     8888888 888       888 8888888888"""
 beertime_plain = "BEERTIME!"
 
+beerdays = {
+    "monday" : 0,
+    "tuesday" : 1,
+    "wednesday" : 2,
+    "thursday" : 3,
+    "friday" : 4,
+    "saturday" : 5,
+    "sunday" : 6
+}
+
 ## Other global variables
 show_beertime = True
 cursor_up = "\033[A"
@@ -109,6 +119,33 @@ def print_beertime_plain():
         print(" " * 16, end = '\r')
     show_beertime = not show_beertime
 
+################################################################################
+def parse_user_beertime(ubeer_time):
+
+    beerhour = ubeer_time[:-3]
+    beerminute = ubeer_time[-2:]
+
+    try:
+        beertime = datetime.time(int(beerhour), int(beerminute), 0, 0)
+        return beertime
+    except:
+        print("Oops, you must provide the beertime in the \"hh:mm\" format"
+                " e.g. 16:00 for four o clock")
+        print("\033[?25h")
+        sys.exit(0)
+
+################################################################################
+def parse_user_beerday(ubeer_day):
+
+    try:
+        ubeer_day = ubeer_day.lower();
+        return beerdays[ubeer_day]
+    except:
+        print("Oops, looks like you got your beerday wrong. Did you misspell it?"
+                "\nValid options are (case insensitive):\n"
+                "monday, tuesday, wednesday, thursday, friday, saturday, sunday")
+        print("\033[?25h")
+        sys.exit(0)
 
 ###############################################################################
 if __name__ == "__main__":
@@ -116,12 +153,11 @@ if __name__ == "__main__":
     parser = ap.ArgumentParser(description="Print Time till the next BEER EVENT!!")
     parser.add_argument("--fancy", help="Print countdown in fancy ASCII art",
             action="store_true")
+    parser.add_argument("beerday", nargs="?", help="Your beerday case-insensitive [default: friday]",
+            default="friday")
+    parser.add_argument("beertime", nargs="?", help="The start of your beertime in hh:mm [default: 16:00]",
+            default="16:00")
 
-    ## Hide cursor
-    print("\033[?25l", end="")
-
-    ## Register signal handler
-    signal.signal(signal.SIGINT, sigint_handler)
 
     ## Print title
     for i in range(len(title)):
@@ -136,6 +172,14 @@ if __name__ == "__main__":
     else:
         print_time = print_time_plain
         print_beertime = print_beertime_plain
+
+    beeroclock = parse_user_beertime(args.beertime)
+    beerday = parse_user_beerday(args.beerday)
+
+    ## Hide cursor
+    print("\033[?25l", end="")
+    ## Register signal handler
+    signal.signal(signal.SIGINT, sigint_handler)
 
     ## Main Loop
     while True:
