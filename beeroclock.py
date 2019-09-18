@@ -2,6 +2,7 @@
 from datetime import datetime as dtime
 from datetime import timedelta as timed
 import time
+import signal
 import sys
 import argparse as ap
 
@@ -49,6 +50,14 @@ beeroclock = 16
 delta_days = 0
 
 ################################################################################
+## Signal Handler for SIGINT
+def sigint_handler(sig, frame):
+    ## Restore cursor
+    print(cursor_up, end="")
+    print("\033[?25h")
+    sys.exit(0)
+
+################################################################################
 def print_time_fancy(days, hours, mins, secs):
 
     ## Hours
@@ -84,7 +93,7 @@ def print_beertime_fancy():
     else:
         for i in range(9):
             print(" " * 87)
-        
+
     print(cursor_up * 10)
     show_beertime = not show_beertime
 
@@ -104,6 +113,12 @@ if __name__ == "__main__":
     parser = ap.ArgumentParser(description="Print Time till the next BEER EVENT!!")
     parser.add_argument("--fancy", help="Print countdown in fancy ASCII art",
             action="store_true")
+
+    ## Hide cursor
+    print("\033[?25l", end="")
+
+    ## Register signal handler
+    signal.signal(signal.SIGINT, sigint_handler)
 
     ## Print title
     for i in range(len(title)):
@@ -134,7 +149,7 @@ if __name__ == "__main__":
                 delta_days = 7
         else:
             delta_days = (beerday-current_weekday)%7
-        
+
         beerdate = now.date() + timed(days=delta_days)
         beerdatetime = dtime(beerdate.year, beerdate.month, beerdate.day,
                 beeroclock, 0,0,0)
