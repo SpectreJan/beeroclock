@@ -22,4 +22,4 @@ Defaults are set to:
 * friday 16:00 (#TGIF)
 
 # ATTENTION
-Even it is beertime and you are having fun, please always drink responsible. With excessive drinking you will definitely hurt yourself and the people around you (partner/family/friends/co-workers). Please take care of yourself, and by extension also the people who care for you. Proper drinking behaviour will also ensure a better/longer beeroclock experience, as well as overall happiness. The beeroclock definitely works excellent with alcoholfree beer as well, so you might want to give that a shot too!
+Even if it's beertime and you are having fun, please always drink responsible. With excessive drinking you will definitely hurt yourself and the people around you (partner/family/friends/co-workers). Please take care of yourself, and by extension also the people who care for you. Proper drinking behaviour will also ensure a better/longer beeroclock experience, as well as overall happiness. The beeroclock definitely works excellent with alcoholfree beer as well, so you might want to give that a shot too!
