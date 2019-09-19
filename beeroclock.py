@@ -56,8 +56,6 @@ beerdays = {
 ## Other global variables
 show_beertime = True
 cursor_up = "\033[A"
-beerday = 2
-beeroclock = datetime.time(21, 35, 0, 0)
 delta_days = 0
 
 ################################################################################
