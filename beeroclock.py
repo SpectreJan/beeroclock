@@ -193,13 +193,11 @@ if __name__ == "__main__":
         beerdatetime = dtime.combine(beerdate,
                 beeroclock)
 
-        if now < beerdatetime:
-            pass
-        elif now <= beerdatetime + timed(hours=4):
+        if beerdatetime <= now <= beerdatetime + timed(hours=4):
             print_beertime()
             time.sleep(1)
             continue
-        else:
+        elif now > beerdatetime + timed(hours=4):
             beerdatetime = beerdatetime + timed(days=7)
 
         diff_dtime = beerdatetime - now
