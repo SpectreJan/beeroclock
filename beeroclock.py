@@ -5,7 +5,11 @@ import datetime
 import time
 import signal
 import sys
+import tkinter
+from PIL import ImageTk, Image
 import argparse as ap
+from pathlib import Path
+import subprocess
 
 ## Title
 title = [
@@ -31,6 +35,8 @@ nine = [" _ ", "(_|", " _|"]
 zero = [" _ ", "/_\\", "\\_/"]
 delimi = ["   ", " o ", " o "]
 digits = [zero, one, two, three, four, five, six, seven, eight, nine]
+
+pwd = Path().absolute()
 
 beertime_fancy = """
 888888b.   8888888888 8888888888 8888888b. 88888888888 8888888 888b     d888 8888888888
@@ -117,6 +123,82 @@ def print_beertime_plain():
         print(" " * 16, end = '\r')
     show_beertime = not show_beertime
 
+show_bt = True
+def calc_beertime(beerday, beeroclock):
+    now = dtime.now()
+    now_ts = now.timestamp()
+    current_weekday = now.weekday()
+    now_t = now.time()
+
+    delta_days = (beerday-current_weekday)%7
+
+    beerdate = now.date() + timed(days=delta_days)
+    beerdatetime = dtime.combine(beerdate,
+            beeroclock)
+
+    if beerdatetime <= now <= beerdatetime + timed(hours=4):
+        return 0
+    elif now > beerdatetime + timed(hours=4):
+        beerdatetime = beerdatetime + timed(days=7)
+    diff_dtime = beerdatetime - now
+
+    return diff_dtime
+renderFontPrompt = ("Hack", 120)
+renderFontLabel = ("Hack", 90)
+renderFontBeertime = ("Hack", 110)
+
+play_sound = True
+def set_t(beerday, beeroclock):
+    global label
+    global show_bt
+    global beermugLabel
+    global play_sound
+    dt = calc_beertime(beerday, beeroclock)
+
+    if dt != 0: 
+        label.config(fg="black", text=str(dt), font=renderFontLabel)
+        label.after(333, set_t, beerday, beeroclock)
+        play_sound = True
+    else:
+
+        if play_sound == True:
+            dixiefile = pwd / "dixie-horn_daniel-simion.wav"
+            play_sound = False
+            subprocess.Popen(['aplay', str(dixiefile)])
+        label.config(fg="yellow", text="BEERTIME", font=renderFontBeertime)
+        if show_bt == True:
+            label.place(relx=.5, rely=.5, anchor="center")
+            beermugLabel.place(relx=0.5, rely=0.75, anchor="center")
+        else:
+            beermugLabel.place_forget()
+            label.place_forget()
+
+        show_bt = not show_bt
+        label.after(1000, set_t, beerday, beeroclock)
+            
+    
+top = tkinter.Tk();
+
+beermugImage = ImageTk.PhotoImage(Image.open('beermug.png').resize((200,200), Image.ANTIALIAS))
+beermugLabel = tkinter.Label(top, image = beermugImage)
+beermugLabel.place(relx=0.5, rely=0.75, anchor="center")
+beermugLabel.place_forget()
+
+prompt = tkinter.Label(top, text="Beeroclock!")
+prompt.configure(anchor="center")
+prompt.config(font=renderFontPrompt) 
+prompt.place(relx=.5, rely=.25, anchor="center")
+label = tkinter.Label(top, text="", borderwidth=0)
+label.configure(anchor="center")
+label.config(font=renderFontLabel)
+label.place(relx=.5, rely=.5, anchor="center")
+top.attributes("-fullscreen", True)
+def beertime_tkinter(beerday, beeroclock):
+    global top
+    global label
+    top.mainloop()
+
+
 ################################################################################
 def parse_user_beertime(ubeer_time):
 
@@ -165,7 +247,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.fancy == True:
-        print_time = print_time_fancy
+        print_time = beertime_tkinter
         print_beertime = print_beertime_fancy
     else:
         print_time = print_time_plain
@@ -173,41 +255,18 @@ if __name__ == "__main__":
 
     beeroclock = parse_user_beertime(args.beertime)
     beerday = parse_user_beerday(args.beerday)
+    label.after(333, set_t, beerday, beeroclock)
 
     ## Hide cursor
     print("\033[?25l", end="")
     ## Register signal handler
     signal.signal(signal.SIGINT, sigint_handler)
 
-    ## Main Loop
-    while True:
+    beertime_tkinter(beerday, beeroclock)
 
-        now = dtime.now()
-        now_ts = now.timestamp()
-        current_weekday = now.weekday()
-        now_t = now.time()
+        # print_time(diff_dtime.days, int(diffhour), int(diffminute), diffsec)
 
-        delta_days = (beerday-current_weekday)%7
-
-        beerdate = now.date() + timed(days=delta_days)
-        beerdatetime = dtime.combine(beerdate,
-                beeroclock)
-
-        if beerdatetime <= now <= beerdatetime + timed(hours=4):
-            print_beertime()
-            time.sleep(1)
-            continue
-        elif now > beerdatetime + timed(hours=4):
-            beerdatetime = beerdatetime + timed(days=7)
-
-        diff_dtime = beerdatetime - now
-        diffhour = diff_dtime.seconds/3600
-        diffminute = (diff_dtime.seconds % 3600)/60
-        diffsec = (diff_dtime.seconds % 60)
-
-        print_time(diff_dtime.days, int(diffhour), int(diffminute), diffsec)
-
-        sleep_duration = 0.25 - (dtime.now().timestamp() - now_ts)
-        if sleep_duration > 0:
-            time.sleep(sleep_duration)
+        # sleep_duration = 0.25 - (dtime.now().timestamp() - now_ts)
+        # if sleep_duration > 0:
+            # time.sleep(sleep_duration)
 
