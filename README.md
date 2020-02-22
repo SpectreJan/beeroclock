@@ -23,3 +23,6 @@ Defaults are set to:
 
 # ATTENTION
 Even if it's beertime and you are having fun, please always drink responsible. With excessive drinking you will definitely hurt yourself and the people around you (partner/family/friends/co-workers). Please take care of yourself, and by extension also the people who care for you. Proper drinking behaviour will also ensure a better/longer beeroclock experience, as well as overall happiness. The beeroclock definitely works excellent with alcoholfree beer as well, so you might want to give that a shot too!
+
+# Attribution
+The dixie-horn_daniel-simion.wav file has been recorded by Daniel Simion (http://soundbible.com/2179-Dixie-Horn.html) and distributed under Attributions 3.0 license https://creativecommons.org/licenses/by/3.0/legalcode
