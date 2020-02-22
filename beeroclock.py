@@ -157,7 +157,7 @@ def set_t(beerday, beeroclock):
 
     if dt != 0: 
         label.config(fg="black", text=str(dt), font=renderFontLabel)
-        label.after(333, set_t, beerday, beeroclock)
+        label.after(33, set_t, beerday, beeroclock)
         play_sound = True
     else:
 
@@ -255,7 +255,7 @@ if __name__ == "__main__":
 
     beeroclock = parse_user_beertime(args.beertime)
     beerday = parse_user_beerday(args.beerday)
-    label.after(333, set_t, beerday, beeroclock)
+    label.after(33, set_t, beerday, beeroclock)
 
     ## Hide cursor
     print("\033[?25l", end="")
