@@ -192,6 +192,7 @@ label = tkinter.Label(top, text="", borderwidth=0)
 label.configure(anchor="center")
 label.config(font=renderFontLabel)
 label.place(relx=.5, rely=.5, anchor="center")
+top.config(cursor="none")
 top.attributes("-fullscreen", True)
 def beertime_tkinter(beerday, beeroclock):
     global top
