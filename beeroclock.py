@@ -6,6 +6,7 @@ import time
 import signal
 import sys
 import tkinter
+import random
 from PIL import ImageTk, Image
 import argparse as ap
 from pathlib import Path
@@ -26,6 +27,21 @@ beerdays = {
 ## Other global variables
 show_beertime = True
 delta_days = 0
+
+renderFontPrompt = ("Hack", 120)
+renderFontLabel = ("Hack", 90)
+renderFontBeertime = ("Hack", 110)
+renderFontGit = ("Hack", 75)
+
+beer_prompt = "BEER O' CLOCK"
+git_prompt = "Time since last GIT incident"
+prompt_text = beer_prompt
+prompt_font = renderFontPrompt
+rand_start_time = timed(days=random.randrange(0, 21, 1),
+                hours=random.randrange(0,25,1),
+                minutes=random.randrange(1,61,1),
+                seconds=random.randrange(0,61,1))
+start_time = dtime.now()
 
 ################################################################################
 def calc_beertime(beerday, beeroclock):
@@ -49,9 +65,6 @@ def calc_beertime(beerday, beeroclock):
     return diff_dtime
 
 ################################################################################
-renderFontPrompt = ("Hack", 120)
-renderFontLabel = ("Hack", 90)
-renderFontBeertime = ("Hack", 110)
 
 show_bt = True
 play_sound = True
@@ -60,7 +73,13 @@ def set_t(beerday, beeroclock):
     global show_bt
     global beermugLabel
     global play_sound
-    dt = calc_beertime(beerday, beeroclock)
+    global show_beer
+
+    if show_beer:
+        dt = calc_beertime(beerday, beeroclock)
+    else:
+        delta = dtime.now() - start_time;
+        dt = rand_start_time + delta
 
     if dt != 0: 
         label.config(fg="black", text=str(dt), font=renderFontLabel)
@@ -82,12 +101,37 @@ def set_t(beerday, beeroclock):
 
         show_bt = not show_bt
         label.after(1000, set_t, beerday, beeroclock)
-            
+
+################################################################################
+show_beer = True
+def set_prompt(event):
+    global prompt_text
+    global git_prompt
+    global beer_prompt
+    global beermugLabel
+    global label
+    global show_beer
+    global prompt
+    show_beer = not show_beer
+    if show_beer:
+        prompt_text = beer_prompt
+        prompt_font = renderFontPrompt
+        prompt_color = "black"
+    else:
+        beermugLabel.place_forget()
+        label.config(text="Calculating...", fg="black")
+        label.place(relx=.5, rely=.5, anchor="center")
+        prompt_text = git_prompt
+        prompt_font = renderFontGit
+        prompt_color = "red"
+    prompt.config(text=prompt_text, font=prompt_font, fg = prompt_color)
+
 ################################################################################
 ## Top Window
 top = tkinter.Tk();
 top.config(cursor="none")
 top.attributes("-fullscreen", True)
+top.bind("<Button-1>", set_prompt)
 
 ## Beermug Label to be displayed
 beermugImage = ImageTk.PhotoImage(Image.open('beermug.png').resize((200,200), Image.ANTIALIAS))
@@ -96,7 +140,7 @@ beermugLabel.place(relx=0.5, rely=0.75, anchor="center")
 beermugLabel.place_forget()
 
 ## Beeroclock prompt
-prompt = tkinter.Label(top, text="Beeroclock!")
+prompt = tkinter.Label(top, text=prompt_text)
 prompt.configure(anchor="center")
 prompt.config(font=renderFontPrompt) 
 prompt.place(relx=.5, rely=.25, anchor="center")
